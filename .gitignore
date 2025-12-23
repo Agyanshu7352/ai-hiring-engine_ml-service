@@ -21,8 +21,7 @@ venv/
 *.h5
 *.pt
 *.onnx
-models/
-model/
+
 
 # =========================
 # Logs
