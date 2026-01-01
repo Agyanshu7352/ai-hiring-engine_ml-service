@@ -28,7 +28,7 @@ def health_check():
 
 @app.route('/parse-resume', methods=['POST'])
 def parse_resume():
-    console.log("Received request to /parse-resume");
+    print("Received request to /parse-resume");
     try:
         if 'resume' not in request.files:
             return jsonify({'error': 'Resume file is required'}), 400
