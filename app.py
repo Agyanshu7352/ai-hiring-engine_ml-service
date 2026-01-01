@@ -29,27 +29,34 @@ def health_check():
 @app.route('/parse-resume', methods=['POST'])
 def parse_resume():
     try:
-        data = request.json
-        file_path = data.get('filePath')
-        
-        if not file_path:
-            return jsonify({'error': 'File path is required'}), 400
-        
-        # Extract text from file
+        if 'resume' not in request.files:
+            return jsonify({'error': 'Resume file is required'}), 400
+
+        file = request.files['resume']
+
+        if file.filename == '':
+            return jsonify({'error': 'Empty file'}), 400
+
+        # Save file temporarily
+        upload_dir = 'uploads'
+        os.makedirs(upload_dir, exist_ok=True)
+        file_path = os.path.join(upload_dir, file.filename)
+        file.save(file_path)
+
+        # Extract text
         extracted_text = extract_text(file_path)
-        
+
         if not extracted_text:
-            return jsonify({'error': 'Failed to extract text from file'}), 400
-        
-        # Parse resume
+            return jsonify({'error': 'Failed to extract text'}), 400
+
         parsed_data = resume_parser.parse(extracted_text)
-        
+
         return jsonify({
             'success': True,
-            'extractedText': extracted_text[:500],  # First 500 chars
+            'extractedText': extracted_text[:500],
             'parsedData': parsed_data
         })
-    
+
     except Exception as e:
         print(f"Error in parse_resume: {str(e)}")
         return jsonify({'error': str(e)}), 500
